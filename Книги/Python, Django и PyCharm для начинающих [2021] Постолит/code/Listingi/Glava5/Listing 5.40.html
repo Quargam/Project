@@ -1,0 +1,10 @@
+<!-- Listing 5.40-->
+{% extends "firstapp/base.html" %}
+{% block title %}Index{% endblock title %}
+{% block header %}Главная страница{% endblock header %}
+{% block content%}
+<p>Категории продуктов</p>
+{% for i in cat %}
+        <li>{{ i }}</li>
+     {% endfor %}
+{% endblock content %}

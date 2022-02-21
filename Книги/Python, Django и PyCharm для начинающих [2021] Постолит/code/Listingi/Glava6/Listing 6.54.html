@@ -1,0 +1,22 @@
+<-- Listing 6.54-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Форма Django!</title>
+</head>
+<body>
+<h2>Валидация группы полей</h2>
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        <div class="form-group">
+            {% for field in form %}
+                <div>{{field.label_tag}}</div>
+                <div>{{field}}</div>
+                <div class="error">{{field.errors}}</div>
+            {% endfor %}
+        </div>
+        <input type="submit" value="Оправить" >
+    </form>
+</body>
+</html>

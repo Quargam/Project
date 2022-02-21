@@ -1,0 +1,10 @@
+<!-- Listing 5.41-->
+{% block content%}
+<p>Категории продуктов</p>
+{% for i in cat %}
+        <li>{{ i }}</li>
+    {% empty %}
+       <li>Категории продуктов отсутствуют</li>
+    {% endfor %}
+{% endblock content %}
+

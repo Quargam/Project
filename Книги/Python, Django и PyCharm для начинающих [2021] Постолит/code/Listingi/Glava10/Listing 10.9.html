@@ -1,0 +1,4 @@
+<-- Listing 10.9-->
+Для смены пароля пользователя с электронной почтой {{ email }}. Перейдите по ссылке ниже:
+{{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+

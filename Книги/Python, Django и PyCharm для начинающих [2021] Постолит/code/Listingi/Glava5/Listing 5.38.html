@@ -1,0 +1,13 @@
+<!-- Listing 5.38-->
+{% extends "firstapp/base.html" %}
+{% block title %}Index{% endblock title %}
+{% block header %}Главная страница{% endblock header %}
+{% block content%}
+<p>Анализ возраста клиента</p>
+{% if age > 60 %}
+    <p>Клиент достиг пенсионного возраста</p>
+{% else %}
+    <p>Клиент не является пенсионером</p>
+{% endif %}
+{% endblock content %}
+

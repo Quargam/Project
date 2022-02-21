@@ -1,0 +1,26 @@
+<-- Listing 6.58-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Форма Django!</title>
+    <style>
+    .field{font-weight:bold;}
+    .error{color:red;}
+    </style>
+</head>
+
+<body class="container">
+<h2>Стилизация полей</h2>
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        <table>
+        {{form}}
+        </table>
+        <input type="submit" value="Оправить" >
+    </form>
+</body>
+</html>
+
+
