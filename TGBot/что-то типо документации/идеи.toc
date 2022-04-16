@@ -6,4 +6,4 @@
 \contentsline {section}{\numberline {5}Админская часть}{4}{}%
 \contentsline {section}{\numberline {6}Работа с другими ботами}{4}{}%
 \contentsline {section}{\numberline {7}Работа с базой данных}{4}{}%
-\contentsline {section}{\numberline {8}Вывод}{4}{}%
+\contentsline {section}{\numberline {8}Вывод}{5}{}%

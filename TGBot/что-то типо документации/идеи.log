@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.6) (preloaded format=pdflatex 2021.9.18)  24 FEB 2022 05:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.6) (preloaded format=pdflatex 2021.9.18)  16 APR 2022 13:00
 entering extended mode
 **./идеи.tex
 (идеи.tex
@@ -1001,15 +1001,24 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[4] (идеи.aux) ) 
+[4]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[5] (идеи.aux) ) 
 Here is how much of TeX's memory you used:
  18923 strings out of 478864
  353744 string characters out of 2865142
- 669920 words of memory out of 3000000
+ 668921 words of memory out of 3000000
  36480 multiletter control sequences out of 15000+600000
  411421 words of font info for 38 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 89i,11n,86p,640b,336s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 89i,11n,86p,646b,344s stack positions out of 5000i,500n,10000p,200000b,80000s
  <C:\Users\Lenovo\AppData\Local\MiKTeX\fonts/pk/ljfour/jkna
 ppen/ec/dpi600\tcrm1200.pk> <C:\Users\Lenovo\AppData\Local\MiKTeX\fonts/pk/ljfo
 ur/lh/lh-t2a/dpi600\labx1200.pk> <C:\Users\Lenovo\AppData\Local\MiKTeX\fonts/pk
@@ -1019,9 +1028,9 @@ X\fonts/pk/ljfour/lh/lh-t2a/dpi600\larm1440.pk> <C:\Users\Lenovo\AppData\Local\
 MiKTeX\fonts/pk/ljfour/lh/lh-t2a/dpi600\labx2488.pk> <C:\Users\Lenovo\AppData\L
 ocal\MiKTeX\fonts/pk/ljfour/lh/lh-t2a/dpi600\larm1728.pk> <C:\Users\Lenovo\AppD
 ata\Local\MiKTeX\fonts/pk/ljfour/lh/lh-t2a/dpi600\labx1440.pk>
-Output written on идеи.pdf (4 pages, 180586 bytes).
+Output written on идеи.pdf (5 pages, 183564 bytes).
 PDF statistics:
- 331 PDF objects out of 1000 (max. 8388607)
+ 340 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  22 words of extra memory for PDF output out of 10000 (max. 10000000)
 

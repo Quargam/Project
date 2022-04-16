@@ -11,7 +11,7 @@ async def download_file(message: types.Message):
     print(file_info)
     print(file_id)
     # await bot.download_file_by_id(file_id, destination=r'C:\Users\Lenovo\Desktop\python\TGBot\HPB\' + f'{file_id}.jpg')
-    # print(os.getcwd())
+    print(os.getcwd())
     # path = file_id + ".jpg"
     # file_info = bot.get_file(file_id)
     # downloaded_file = bot.download_file(file_info.file_path)

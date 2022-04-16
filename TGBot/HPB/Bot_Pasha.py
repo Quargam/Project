@@ -2,7 +2,7 @@ from aiogram.utils import executor
 from create_bot import dp, bot
 from data_base import sqlite_db
 import logging
-import asyncio
+# import asyncio
 
 
 
