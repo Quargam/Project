@@ -1,9 +1,0 @@
-\babel@toc {russian}{}
-\contentsline {section}{\numberline {1}Введение}{3}{}%
-\contentsline {section}{\numberline {2}Действия перед началом}{3}{}%
-\contentsline {section}{\numberline {3}Основной функционал}{3}{}%
-\contentsline {section}{\numberline {4}Клиентская часть}{3}{}%
-\contentsline {section}{\numberline {5}Админская часть}{4}{}%
-\contentsline {section}{\numberline {6}Работа с другими ботами}{4}{}%
-\contentsline {section}{\numberline {7}Работа с базой данных}{4}{}%
-\contentsline {section}{\numberline {8}Вывод}{5}{}%
