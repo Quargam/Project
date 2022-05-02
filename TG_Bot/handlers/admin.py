@@ -8,8 +8,14 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards import admin_kb
 from data_base import sqlite_db, db
 import ast
+import datetime
+from apscheduler.schedulers.asyncio import AsyncIOScheduler # для отправки сообщений в определенное время асинхр
 
 db_users = db.Database_users("Users_db.db")  # объект для управления users в БД
+scheduler = AsyncIOScheduler()
+TimerFlag = False
+Days = {0: "пн", 1: "вт", 2: "ср", 3: "чт", 4: "пт", 5: "сб", 6: "вс"}
+
 
 class FSM_generic(StatesGroup):  # Машины состояний
     Step_event_0 = State()
@@ -207,6 +213,54 @@ async def delete_item_place(message: types.Message):
                                    add(InlineKeyboardButton(f'удалить {ret[1]}', callback_data=f'del_place {ret[1]}')))
     await message.delete()
 
+# отправляет сообщение с учетом расписания и дня недели
+async def send_channel():
+    if datetime.datetime.today().weekday() <= 5:
+        file = open("schedule.txt", encoding='utf-8')
+        res_dict = ast.literal_eval(file.read())
+        await bot.send_message(chat_id=int(open('ID_chat.txt').read()),
+                               text='хоккей ' + Days[datetime.datetime.today().weekday()] + '\n' +
+                               str(datetime.datetime.now())[0:16] + '\n' +
+                               res_dict[str(datetime.datetime.today().weekday())],
+                               parse_mode=None,
+                               disable_notification=True)
+    else:
+        pass
+
+# запускает отправку сообщений к конфу каждые 10 сек
+def timer():
+    global scheduler
+    scheduler.add_job(send_channel, 'interval', seconds=10)
+    scheduler.start()
+
+# включает таймер
+# @dp.message_handler(commands=['Включить_регулярную_отправку_сообщений'])
+async def start_timer(message: types.Message):
+    if message.chat["type"] == "private":
+        global TimerFlag
+        if TimerFlag is False:
+            await message.answer('timer start \n в группу будет отправлять сообщение каждые 5 минут\n '
+                                 'частоту и период отправки можно настраивать')
+            timer()
+            TimerFlag = True
+        else:
+            await message.answer('timer is running')
+    else:
+        pass
+
+#выключает таймер
+# @dp.message_handler(commands=['Выключить_регулярную_отправку_сообщений'])
+async def off_timer(message: types.Message):
+    if message.chat["type"] == "private":
+        global TimerFlag, scheduler
+        if TimerFlag is False:
+            pass
+        else:
+            scheduler.shutdown()
+            TimerFlag = False
+    else:
+        pass
+
 # команды к функциям
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(make_changes_command, commands=['модератор'], is_chat_admin=True)
@@ -225,3 +279,5 @@ def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(place_location, content_types=['location'], state=FSM_generic.Step_place_0)
     dp.register_message_handler(place_title, state=FSM_generic.Step_place_1)
     dp.register_message_handler(place_address, state=FSM_generic.Step_place_2)
+    dp.register_message_handler(start_timer, commands='Включить_регулярную_отправку_сообщений', state=None)
+    dp.register_message_handler(off_timer, commands='Выключить_регулярную_отправку_сообщений', state=None)
