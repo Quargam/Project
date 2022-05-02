@@ -7,8 +7,6 @@ from data_base import sqlite_db
 # Сбытие которое должно выполнится 1 раз при запуске
 async def on_startup(_):
     print('Бот стал онлайн')
-    await bot.send_message(1116537818, 'Бот стал онлайн')
-    print(bot.__dict__)
     sqlite_db.sql_start() # подключение к БД
 
 # Импортируем клиенскую, админскую и остальную часть кода

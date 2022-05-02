@@ -6,7 +6,6 @@ def sql_start():
     base = sq.connect('event_sport.db') # Подключение к БД сабытий
     cur = base.cursor() # Курсор БД событий
     baseU = sq.connect('Users_db.db') # Подключение к БД пользователей
-    # baseA = sq.connect('Admins_db.db') # Подключение к БД админов
     if base:
         print('Data base_menu connected OK!')
     # создание БД событий событий
@@ -51,6 +50,6 @@ async def sql_read2():
     return cur.execute('SELECT * FROM event').fetchall()
 
 # удаление мероприятие из БД
-async def sql_delete_command(data):
-    cur.execute('DELETE FROM event WHERE name == ?', (data,))
+async def sql_delete_command(name):
+    cur.execute('DELETE FROM event WHERE name == ?', (name,))
     base.commit()

@@ -1,2 +1,6 @@
 # ignore all DB
 *.db
+# ignore all txt
+*.txt
+# ignore pycharm
+**/__pycache__
