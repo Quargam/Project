@@ -38,16 +38,15 @@ async def schedule(message: types.Message):
         await bot.send_message(message.from_user.id, text='файл не найден')
 
 # # Выводит Нормативы
-# @dp.message_handler(commands=['Нормативы'])
-# async def exercise_standards(message: types.Message):
-#     try:
-#         file = open("exercise_standards.txt", encoding='utf-8')
-#         res_dict = ast.literal_eval(file.read())
-#         print(res_dict)
-#         # Выводи расписание преподователей
-#         await bot.send_message(message.from_user.id, str(res_dict))
-#     except FileNotFoundError:
-#         await bot.send_message(message.from_user.id, text='файл не найден')
+@dp.message_handler(commands=['Нормативы'])
+async def exercise_standards(message: types.Message):
+    try:
+        file = open("exercise_standards.txt", encoding='utf-8')
+        res_dict = ast.literal_eval(file.read())
+        print(res_dict)
+        await bot.send_photo(message.from_user.id, res_dict[0], f'Описание:{res_dict[1]}\n')
+    except FileNotFoundError:
+        await bot.send_message(message.from_user.id, text='файл не найден')
 
 
 def register_handlers_client(dp: Dispatcher):
