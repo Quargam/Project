@@ -156,18 +156,51 @@ async def exercise_standards_text(message: types.Message, state: FSM_generic):
         file.write(str(tuple(data.values())))
     await bot.send_message(message.from_user.id, 'Команда выполнена', reply_markup=admin_kb.button_case_admin)
 
+# Команда чтобы загрузить локацию
+@dp.message_handler(commands=['Загрузить_геопозицию'], state=None)
+async def place_admin(message: types.Message):
+    if db_users.user_exists(message.from_user.id, 'admins'):
+        await FSM_generic.Step_place_0.set()
+        await message.reply('отправьте геопозицию', reply_markup=admin_kb.button_case_admin_with_but_cancel)
+
+# @dp.message_handler(content_types=['location'], state=FSM_generic.Step_place_0)
+async def place_location(message: types.Message, state: FSM_generic):
+    async with state.proxy() as data:
+        data['Step_place_0'] = str(message.location)
+    await FSM_generic.Step_place_1.set()
+    await message.reply("Теперь введи название геопозиции")
+
+# @dp.message_handler(state=FSM_generic.Step_place_1)
+async def place_title(message: types.Message, state: FSM_generic):
+    async with state.proxy() as data:
+        data['Step_place_1'] = message.text
+    await FSM_generic.Step_place_2.set()
+    await message.reply("Теперь введи адрес геопозиции")
+
+# @dp.message_handler(state=FSM_generic.Step_place_2)
+async def place_address(message: types.Message, state: FSM_generic):
+    async with state.proxy() as data:
+        data['Step_place_2'] = message.text
+        # print(data)
+    await sqlite_db.sql_add_place_command(state)
+    await state.finish()
+    await message.reply("геолокация успешна согранена", reply_markup=admin_kb.button_case_admin)
 
 # команды к функциям
 def register_handlers_client(dp: Dispatcher):
-    dp.register_message_handler(make_changes_command, commands=['moderator'], is_chat_admin=True)
+    dp.register_message_handler(make_changes_command, commands=['модератор'], is_chat_admin=True)
     dp.register_message_handler(cancel_handler, state='*', commands='Отмена')
-    dp.register_message_handler(cm_start, commands='Загрузить', state=None)
+    dp.register_message_handler(cm_start, commands='Загрузить_Мероприятие', state=None)
     dp.register_message_handler(load_photo, content_types=['photo'], state=FSM_generic.Step_event_0)
     dp.register_message_handler(load_name, state=FSM_generic.Step_event_1)
     dp.register_message_handler(load_description, state=FSM_generic.Step_event_2)
+    dp.register_message_handler(delete_item, commands=['Удалить_Мероприятие'])
     dp.register_message_handler(exercise_standards_admin, commands=['Загрузить_нормативы'], state=None)
     dp.register_message_handler(exercise_standards_photo, content_types=['photo'], state=FSM_generic.Step_exercise_standards_0)
     dp.register_message_handler(exercise_standards_text, state=FSM_generic.Step_exercise_standards_1)
     dp.register_message_handler(command_sendall, commands=['Рассылка'], state=None)
     dp.register_message_handler(sendall, state=FSM_generic.Step_sendall_0)
-    dp.register_message_handler(delete_item, commands=['Удалить'])
+    dp.register_message_handler(place_admin, commands='Загрузить_геопозицию', state=None)
+    dp.register_message_handler(place_location, content_types=['location'], state=FSM_generic.Step_place_0)
+    dp.register_message_handler(place_title, state=FSM_generic.Step_place_1)
+    dp.register_message_handler(place_address, state=FSM_generic.Step_place_2)

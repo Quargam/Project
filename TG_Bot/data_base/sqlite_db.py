@@ -47,9 +47,10 @@ async def sql_add_command(state):
         cur.execute('INSERT INTO event VALUES (?,?,?)', tuple(data.values()))
         base.commit()
 
-async def sql_add_place_command(data):
+# загрузка в БД информации про геопозицию
+async def sql_add_place_command(state):
     async with state.proxy() as data:
-        cur.execute('INSERT INTO event VALUES (?,?,?)', tuple(data.values()))
+        cur.execute('INSERT INTO place VALUES (?,?,?)', tuple(data.values()))
         base.commit()
 
 # Отправка в виде сообщения о всех мероприятиях в БД
