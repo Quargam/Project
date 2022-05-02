@@ -3,4 +3,5 @@
 # ignore all txt
 *.txt
 # ignore pycharm
-**/__pycache__
+*/*/__pycache__/*
+TG_Bot/__pycache__/*
