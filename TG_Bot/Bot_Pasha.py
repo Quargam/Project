@@ -3,7 +3,6 @@ from create_bot import dp, bot
 from data_base import sqlite_db
 # import asyncio
 
-
 # Сбытие которое должно выполнится 1 раз при запуске
 async def on_startup(_):
     print('Бот стал онлайн')

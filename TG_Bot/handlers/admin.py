@@ -18,6 +18,12 @@ class FSM_Admin(StatesGroup): # Машины состояний загрузки
 class FSM_Sendall(StatesGroup): # Машины состояний отправки всем сообщений
     text = State()
 
+class FSM_generic(StatesGroup): # Машины состояний
+    T1 = State()
+    T2 = State()
+    T3 = State()
+    T4 = State()
+
 # Получить ID текущего модератора
 # @dp.message_handler(commands=['moderator'], is_chat_admin=True)
 async def make_changes_command(message: types.Message):
@@ -100,7 +106,7 @@ async def command_sendall(message: types.Message):
         await message.reply('Напишите текст который хотите всем отправить', reply_markup=admin_kb.button_case_admin_with_but_cancel)
 
 @dp.message_handler(state=FSM_Sendall.text)
-async def sendall(message: types.Message, state: FSMContext):
+async def sendall(message: types.Message, state: FSM_Sendall):
     if message.chat.type == 'private':
         text = message.text
         if db_users.user_exists(message.from_user.id, 'admins') and text != '/Отмена':
@@ -118,7 +124,25 @@ async def sendall(message: types.Message, state: FSMContext):
     await state.finish()
     await message.delete()
 
+@dp.message_handler(commands=['Нормативы'], state=None)
+async def exercise_standards_admin(message: types.Message):
+    if db_users.user_exists(message.from_user.id, 'admins'):
+        await FSM_generic.T1.set()
+        await message.reply('Загрузите фото нормативов', reply_markup=admin_kb.button_case_admin_with_but_cancel)
 
+@dp.message_handler(content_types=['photo'], state=FSM_generic.T1)
+async def exercise_standards_photo(message: types.Message, state: FSM_generic):
+    async with state.proxy() as data:
+        data['T1'] = message.photo[0].file_id
+    await FSM_generic.next()
+    await message.reply("Теперь введи описание")
+
+@dp.message_handler(state=FSM_generic.T2)
+async def exercise_standards_photo(message: types.Message, state: FSM_generic):
+    async with state.proxy() as data:
+        data['T2'] = message.text
+    await state.finish()
+    print(data)
 
 # команды к функциям
 def register_handlers_client(dp: Dispatcher):
