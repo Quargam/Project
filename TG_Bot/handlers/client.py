@@ -5,6 +5,7 @@ from data_base import sqlite_db, db
 import ast
 
 db_users = db.Database_users("Users_db.db")
+Days = {0: "пн", 1: "вт", 2: "ср", 3: "чт", 4: "пт", 5: "сб", 6: "вс"}
 
 # Действия когда пользователь вводит команду /start
 async def command_start(message: types.Message):
@@ -27,7 +28,6 @@ async def event_menu_command(message: types.Message):
 # Выводит расписание преподавателей
 # @dp.message_handler(commands=['Расписание'])
 async def schedule(message: types.Message):
-    Days = {0: "пн", 1: "вт", 2: "ср", 3: "чт", 4: "пт", 5: "сб", 6: "вс"}
     try:
         file = open("schedule.txt", encoding='utf-8')
         res_dict = ast.literal_eval(file.read())

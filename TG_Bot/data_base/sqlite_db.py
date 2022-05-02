@@ -15,6 +15,13 @@ def sql_start():
                                                     description TEXT)
                                                     """)
     base.commit()
+    # создание ДБ с точками на карте
+    base.execute("""CREATE TABLE IF NOT EXISTS place(
+                                                    location TEXT, 
+                                                    title TEXT,
+                                                    address TEXT)
+                                                    """)
+    base.commit()
     if baseU:
         print('Data base_users connected OK!')
     #  создание таблицу пользователей в БД
@@ -36,6 +43,11 @@ def sql_start():
 
 # загрузка в БД информации про мероприятие
 async def sql_add_command(state):
+    async with state.proxy() as data:
+        cur.execute('INSERT INTO event VALUES (?,?,?)', tuple(data.values()))
+        base.commit()
+
+async def sql_add_place_command(data):
     async with state.proxy() as data:
         cur.execute('INSERT INTO event VALUES (?,?,?)', tuple(data.values()))
         base.commit()

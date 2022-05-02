@@ -1,19 +1,16 @@
 from aiogram.utils import executor
-from create_bot import dp, bot
+from create_bot import dp
 from data_base import sqlite_db
-# import asyncio
+from handlers import client, admin, other # Импортируем клиенскую, админскую и остальную часть кода
 
-# Сбытие которое должно выполнится 1 раз при запуске
-async def on_startup(_):
+
+async def on_startup(_): # Сбытие которое должно выполнится 1 раз при запуске
     print('Бот стал онлайн')
-    sqlite_db.sql_start() # подключение к БД
+    sqlite_db.sql_start()  # подключение к БД
 
-# Импортируем клиенскую, админскую и остальную часть кода
-from handlers import client, admin, other
-
-client.register_handlers_client(dp) # клиенские функции
-admin.register_handlers_client(dp) # админские функции
-other.register_handlers_other(dp) # остальные функции
+client.register_handlers_client(dp)  # клиенские функции
+admin.register_handlers_client(dp)  # админские функции
+other.register_handlers_other(dp)  # остальные функции
 
 
 if __name__ == '__main__':

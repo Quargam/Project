@@ -1,7 +1,6 @@
-from aiogram import Bot, types
+from aiogram import Bot
 from aiogram.dispatcher import Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-import os
 
 storage = MemoryStorage()  # Машина состояний (хранение класса в оперативной памяти)
 
