@@ -7,7 +7,7 @@ from keyboards import admin_kb
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards import admin_kb
 from data_base import sqlite_db, db
-from aiogram.utils.helper import Helper, HelperMode, ListItem
+import ast
 
 db_users = db.Database_users("Users_db.db")  # объект для управления users в БД
 
@@ -85,10 +85,10 @@ async def cancel_handler(message: types.Message, state: FSM_generic):
 
 
 # удаления пункта мероприятия
-@dp.callback_query_handler(lambda x: x.data and x.data.startswith('del '))
+@dp.callback_query_handler(lambda x: x.data and x.data.startswith('del_event '))
 async def del_callback_run(callback_query: types.CallbackQuery):
-    await sqlite_db.sql_delete_command(callback_query.data.replace('del ', ''))
-    await callback_query.answer(text=f'{callback_query.data.replace("del ", "")} удалена.', show_alert=True)
+    await sqlite_db.sql_delete_command(callback_query.data.replace('del_event ', ''))
+    await callback_query.answer(text=f'{callback_query.data.replace("del_event ", "")} удалена.', show_alert=True)
 
 
 # @dp.message_handler(commands='Удалить')
@@ -98,7 +98,7 @@ async def delete_item(message: types.Message):
         for ret in read:
             await bot.send_photo(message.from_user.id, ret[0], f'{ret[1]}\n описание: {ret[2]}')
             await bot.send_message(message.from_user.id, text='^^^', reply_markup=InlineKeyboardMarkup(). \
-                                   add(InlineKeyboardButton(f'удалить {ret[1]}', callback_data=f'del {ret[1]}')))
+                                   add(InlineKeyboardButton(f'удалить {ret[1]}', callback_data=f'del_event {ret[1]}')))
     await message.delete()
 
 
@@ -185,6 +185,27 @@ async def place_address(message: types.Message, state: FSM_generic):
     await sqlite_db.sql_add_place_command(state)
     await state.finish()
     await message.reply("геолокация успешна согранена", reply_markup=admin_kb.button_case_admin)
+
+# удаления пункта геопозиции
+@dp.callback_query_handler(lambda x: x.data and x.data.startswith('del_place '))
+async def del_callback_place(callback_query: types.CallbackQuery):
+    # сделал какую-то гадость, нужно будет исправить (sqlite_db -> sql_delete_command)
+    await sqlite_db.sql_delete_command(callback_query.data.replace('del_place ', ''), name='title', table='place')
+    await callback_query.answer(text=f'{callback_query.data.replace("del_place ", "")} удалена.', show_alert=True)
+
+
+@dp.message_handler(commands='Удалить_геопозицию')
+async def delete_item_place(message: types.Message):
+    if db_users.user_exists(message.from_user.id, 'admins'):
+        read = await sqlite_db.sql_read2(name='place')
+        for ret in read:
+            # print(ast.literal_eval(ret[0]))
+            await bot.send_venue(message.from_user.id, latitude=ast.literal_eval(ret[0])["latitude"],
+                                 longitude=ast.literal_eval(ret[0])["longitude"],
+                                 title=ret[1], address=ret[2])
+            await bot.send_message(message.from_user.id, text='^^^', reply_markup=InlineKeyboardMarkup(). \
+                                   add(InlineKeyboardButton(f'удалить {ret[1]}', callback_data=f'del_place {ret[1]}')))
+    await message.delete()
 
 # команды к функциям
 def register_handlers_client(dp: Dispatcher):

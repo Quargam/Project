@@ -25,6 +25,13 @@ async def event_menu_command(message: types.Message):
     await sqlite_db.sql_read(message)
     await message.delete()
 
+@dp.message_handler(commands=['места_занятий'])
+async def place_menu_command(message: types.Message):
+    # for ret in cur.execute('SELECT * FROM menu').fetchall():
+    #     await bot.send_photo(message.from_user.id, ret[0], f'{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]}')
+    await sqlite_db.sql_read_place(message)
+    await message.delete()
+
 # Выводит расписание преподавателей
 # @dp.message_handler(commands=['Расписание'])
 async def schedule(message: types.Message):

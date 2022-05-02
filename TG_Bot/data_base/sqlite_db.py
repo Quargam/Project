@@ -1,5 +1,6 @@
 import sqlite3 as sq
 from create_bot import dp, bot
+import ast
 
 def sql_start():
     global base, cur
@@ -54,15 +55,22 @@ async def sql_add_place_command(state):
         base.commit()
 
 # Отправка в виде сообщения о всех мероприятиях в БД
-async def sql_read(message):
-    for ret in cur.execute('SELECT * FROM event').fetchall():
+async def sql_read(message, table='event'):
+    for ret in cur.execute(f'SELECT * FROM {table}').fetchall():
         await bot.send_photo(message.from_user.id, ret[0], f'{ret[1]}\nОписание: {ret[2]}')
 
+# Отправка в виде сообщения о всех местах для занятий в БД
+async def sql_read_place(message, table='place'):
+    for ret in cur.execute(f'SELECT * FROM {table}').fetchall():
+        await bot.send_venue(message.from_user.id, latitude=ast.literal_eval(ret[0])["latitude"],
+                             longitude=ast.literal_eval(ret[0])["longitude"],
+                             title=ret[1], address=ret[2])
+
 # получение информации о всех мероприятиях из БД
-async def sql_read2():
-    return cur.execute('SELECT * FROM event').fetchall()
+async def sql_read2(name='event'):
+    return cur.execute(f'SELECT * FROM {name}').fetchall()
 
 # удаление мероприятие из БД
-async def sql_delete_command(name):
-    cur.execute('DELETE FROM event WHERE name == ?', (name,))
+async def sql_delete_command(title ,name='name', table='event'):
+    cur.execute(f'DELETE FROM {table} WHERE {name} == ?', (title,))
     base.commit()
