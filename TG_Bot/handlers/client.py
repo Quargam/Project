@@ -3,6 +3,7 @@ from create_bot import dp, bot
 from keyboards import kb_client
 from data_base import sqlite_db, db
 import ast
+import json
 
 db_users = db.Database_users("Users_db.db")
 Days = {0: "пн", 1: "вт", 2: "ср", 3: "чт", 4: "пт", 5: "сб", 6: "вс"}
@@ -30,9 +31,9 @@ async def place_menu_command(message: types.Message):
 # Выводит расписание преподавателей
 async def schedule(message: types.Message):
     try:
-        file = open("schedule.txt", encoding='utf-8')
-        res_dict = ast.literal_eval(file.read())
-        await bot.send_message(message.from_user.id, text ='\n'.join(list(f'{Days[day]} - {res_dict[str(day)]}' for day in range(6))))
+        with open("schedule.json", "r", encoding='utf-8') as schedule_json:
+            schedule = json.load(schedule_json)
+        await bot.send_message(message.from_user.id, text ='\n'.join(list(f'{Days[day]} - {schedule[str(day)]}' for day in range(6))))
     except FileNotFoundError:
         await bot.send_message(message.from_user.id, text='файл не найден')
 
@@ -40,9 +41,10 @@ async def schedule(message: types.Message):
 @dp.message_handler(commands=['Нормативы'])
 async def exercise_standards(message: types.Message):
     try:
-        file = open("exercise_standards.txt")
-        res_dict = ast.literal_eval(file.read())
-        await bot.send_photo(message.from_user.id, res_dict[0], f'Описание:{res_dict[1]}\n')
+        with open("exercise_standards.json", "r", encoding='utf-8') as exercise_standards_json:
+            exercise_standards = json.load(exercise_standards_json)
+        await bot.send_photo(message.from_user.id, exercise_standards["photo_exercise_standards"],
+                             f'Описание:{exercise_standards["text_exercise_standards"]}\n')
     except FileNotFoundError:
         await bot.send_message(message.from_user.id, text='файл не найден')
 

@@ -6,6 +6,7 @@ from keyboards import admin_kb
 from data_base import sqlite_db, db
 import ast
 import datetime
+import json
 from apscheduler.schedulers.asyncio import AsyncIOScheduler # для отправки сообщений в определенное время асинхр
 
 db_users = db.Database_users("Users_db.db")  # объект для управления users в БД
@@ -133,17 +134,17 @@ async def exercise_standards_admin(message: types.Message):
 
 async def exercise_standards_photo(message: types.Message, state: FSM_generic):
     async with state.proxy() as data:
-        data['Step_exercise_standards_0'] = message.photo[0].file_id
+        data['photo_exercise_standards'] = message.photo[0].file_id
     await FSM_generic.Step_exercise_standards_1.set()
     await message.reply("Теперь введи описание нормативов")
 
 
 async def exercise_standards_text(message: types.Message, state: FSM_generic):
     async with state.proxy() as data:
-        data['Step_exercise_standards_1'] = message.text
+        data['text_exercise_standards'] = message.text
     await state.finish()
-    with open('exercise_standards.txt', 'w') as file:
-        file.write(str(tuple(data.values())))
+    with open('exercise_standards.json', 'w') as exercise_standards_json:
+        json.dump(data.as_dict(), exercise_standards_json)
     await bot.send_message(message.from_user.id, 'Команда выполнена', reply_markup=admin_kb.button_case_admin)
 
 # Команда чтобы загрузить локацию
@@ -194,10 +195,12 @@ async def delete_item_place(message: types.Message):
 
 # отправляет сообщение с учетом расписания и дня недели
 async def send_channel():
+    with open("ID_chat.json", "r") as ID_chat_json:
+        ID_chat = json.load(ID_chat_json)
     if datetime.datetime.today().weekday() <= 5:
         file = open("schedule.txt", encoding='utf-8')
         res_dict = ast.literal_eval(file.read())
-        await bot.send_message(chat_id=int(open('ID_chat.txt').read()),
+        await bot.send_message(chat_id=int(ID_chat["ID_chat"]),
                                text='хоккей ' + Days[datetime.datetime.today().weekday()] + '\n' +
                                str(datetime.datetime.now())[0:16] + '\n' +
                                res_dict[str(datetime.datetime.today().weekday())],

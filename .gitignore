@@ -7,3 +7,5 @@
 TG_Bot/__pycache__/*
 # ignore all bat
 *.bat
+# ignore all json
+*.json
