@@ -6,9 +6,12 @@ from keyboards import admin_kb
 from data_base import sqlite_db, db
 import ast
 import datetime
+import zoneinfo
 import json
 from apscheduler.schedulers.asyncio import AsyncIOScheduler # для отправки сообщений в определенное время асинхр
 
+NYC = zoneinfo.ZoneInfo("America/New_York")
+datetime.datetime(2020, 1, 1, tzinfo=NYC)
 db_users = db.Database_users("Users_db.db")  # объект для управления users в БД
 scheduler = AsyncIOScheduler()
 TimerFlag = False
@@ -181,7 +184,7 @@ async def del_callback_place(callback_query: types.CallbackQuery):
     await callback_query.answer(text=f'{callback_query.data.replace("del_place ", "")} удалена.', show_alert=True)
 
 
-@dp.message_handler(commands='Удалить_геопозицию')
+# @dp.message_handler(commands='Удалить_геопозицию')
 async def delete_item_place(message: types.Message):
     if db_users.user_exists(message.from_user.id, 'admins'):
         read = await sqlite_db.sql_read2(name='place')
@@ -198,12 +201,13 @@ async def send_channel():
     with open("ID_chat.json", "r") as ID_chat_json:
         ID_chat = json.load(ID_chat_json)
     if datetime.datetime.today().weekday() <= 5:
-        file = open("schedule.txt", encoding='utf-8')
-        res_dict = ast.literal_eval(file.read())
+        with open("schedule.json", "r", encoding='utf-8') as schedule_json:
+            res_dict = json.load(schedule_json)
         await bot.send_message(chat_id=int(ID_chat["ID_chat"]),
                                text='хоккей ' + Days[datetime.datetime.today().weekday()] + '\n' +
                                str(datetime.datetime.now())[0:16] + '\n' +
-                               res_dict[str(datetime.datetime.today().weekday())],
+                               res_dict[str(datetime.datetime.today().weekday())] +
+                               '\n 0 человек',
                                parse_mode=None,
                                disable_notification=True)
     else:
@@ -212,7 +216,13 @@ async def send_channel():
 # запускает отправку сообщений к конфу каждые 10 сек
 def timer():
     global scheduler
-    scheduler.add_job(send_channel, 'interval', seconds=10)
+    # scheduler.add_job(send_channel, 'interval', seconds=10)
+    scheduler.add_job(send_channel, 'cron', day_of_week='mon-sat', hour=9, minute=0)
+    scheduler.add_job(send_channel, 'cron', day_of_week='mon-sat', hour=10, minute=45)
+    # scheduler.add_job(send_channel, 'cron', day_of_week='mon-sat', hour=12, minute=20)
+    scheduler.add_job(send_channel, 'cron', day_of_week='mon-sat', hour=13, minute=55)
+    scheduler.add_job(send_channel, 'cron', day_of_week='mon-sat', hour=15, minute=30)
+    scheduler.add_job(send_channel, 'cron', day_of_week='mon-sat', hour=17, minute=5)
     scheduler.start()
 
 # включает таймер
@@ -220,7 +230,7 @@ async def start_timer(message: types.Message):
     if message.chat["type"] == "private":
         global TimerFlag
         if TimerFlag is False:
-            await message.answer('timer start \n в группу будет отправлять сообщение каждые 5 минут\n '
+            await message.answer('timer start \n в группу будет отправлять сообщение каждые 10 секунд\n '
                                  'частоту и период отправки можно настраивать')
             timer()
             TimerFlag = True
@@ -236,7 +246,7 @@ async def off_timer(message: types.Message):
         if TimerFlag is False:
             pass
         else:
-            scheduler.shutdown()
+            scheduler.shutdown(wait=False)
             TimerFlag = False
     else:
         pass
@@ -244,20 +254,21 @@ async def off_timer(message: types.Message):
 # команды к функциям
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(make_changes_command, commands=['модератор'], is_chat_admin=True)
-    dp.register_message_handler(cancel_handler, state='*', commands='Отмена')
-    dp.register_message_handler(cm_start, commands='Загрузить_Мероприятие', state=None)
+    dp.register_message_handler(cancel_handler, state='*', text='⬅️❌ Отмена')
+    dp.register_message_handler(cm_start, text='⬇️🆕 Загрузить новости', state=None)
     dp.register_message_handler(load_photo, content_types=['photo'], state=FSM_generic.Step_event_0)
     dp.register_message_handler(load_name, state=FSM_generic.Step_event_1)
     dp.register_message_handler(load_description, state=FSM_generic.Step_event_2)
-    dp.register_message_handler(delete_item, commands=['Удалить_Мероприятие'])
-    dp.register_message_handler(exercise_standards_admin, commands=['Загрузить_нормативы'], state=None)
+    dp.register_message_handler(delete_item, text='❌🆕 Удалить новость')
+    dp.register_message_handler(exercise_standards_admin, text='⬇🏃 Загрузить нормативы', state=None)
     dp.register_message_handler(exercise_standards_photo, content_types=['photo'], state=FSM_generic.Step_exercise_standards_0)
     dp.register_message_handler(exercise_standards_text, state=FSM_generic.Step_exercise_standards_1)
-    dp.register_message_handler(command_sendall, commands=['Рассылка'], state=None)
+    dp.register_message_handler(command_sendall, text='📢 Рассылка', state=None)
     dp.register_message_handler(sendall, state=FSM_generic.Step_sendall_0)
-    dp.register_message_handler(place_admin, commands='Загрузить_геопозицию', state=None)
+    dp.register_message_handler(place_admin, text='⬇🚩 Загрузить геопозицию', state=None)
+    dp.register_message_handler(delete_item_place, text='❌🚩 Удалить геопозицию', state=None)
     dp.register_message_handler(place_location, content_types=['location'], state=FSM_generic.Step_place_0)
     dp.register_message_handler(place_title, state=FSM_generic.Step_place_1)
     dp.register_message_handler(place_address, state=FSM_generic.Step_place_2)
-    dp.register_message_handler(start_timer, commands='Включить_регулярную_отправку_сообщений', state=None)
-    dp.register_message_handler(off_timer, commands='Выключить_регулярную_отправку_сообщений', state=None)
+    dp.register_message_handler(start_timer, text='⏲✅ ️Включить отправку сообщений в группу', state=None)
+    dp.register_message_handler(off_timer, text='⏲️❌ Выключить отправку сообщений в группу', state=None)

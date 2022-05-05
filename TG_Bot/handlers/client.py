@@ -21,24 +21,25 @@ async def command_start(message: types.Message):
 
 async def event_menu_command(message: types.Message):
     await sqlite_db.sql_read(message)
-    await message.delete()
+    # await message.delete()
 
-@dp.message_handler(commands=['места_занятий'])
+# @dp.message_handler(commands=['места_занятий'])
 async def place_menu_command(message: types.Message):
     await sqlite_db.sql_read_place(message)
-    await message.delete()
+    # await message.delete()
 
 # Выводит расписание преподавателей
 async def schedule(message: types.Message):
     try:
         with open("schedule.json", "r", encoding='utf-8') as schedule_json:
             schedule = json.load(schedule_json)
-        await bot.send_message(message.from_user.id, text ='\n'.join(list(f'{Days[day]} - {schedule[str(day)]}' for day in range(6))))
+        await bot.send_message(message.from_user.id,
+                               text='\n'.join(list(f'{Days[day]} - {schedule[str(day)]}' for day in range(6)))
+                                    + '\nв 17.05 только по расписанию')
     except FileNotFoundError:
         await bot.send_message(message.from_user.id, text='файл не найден')
 
 # # Выводит Нормативы
-@dp.message_handler(commands=['Нормативы'])
 async def exercise_standards(message: types.Message):
     try:
         with open("exercise_standards.json", "r", encoding='utf-8') as exercise_standards_json:
@@ -51,5 +52,7 @@ async def exercise_standards(message: types.Message):
 
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(command_start, commands=['start', 'help'])
-    dp.register_message_handler(event_menu_command, commands=['Мероприятие'])
-    dp.register_message_handler(schedule, commands=['Расписание'])
+    dp.register_message_handler(event_menu_command, text='🆕 новости')
+    dp.register_message_handler(schedule, text='📝 расписание')
+    dp.register_message_handler(exercise_standards, text='🏃 нормативы')
+    dp.register_message_handler(place_menu_command, text='🚩 места занятий')

@@ -1,20 +1,20 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 
 #Кнопки клавиатуры админа
-button_load = KeyboardButton('/Загрузить_Мероприятие')
-button_delete = KeyboardButton('/Удалить_Мероприятие')
-button_cancel = KeyboardButton('/Отмена')
-button_back = KeyboardButton('/Назад')
-button_event = KeyboardButton('/Мероприятие')
-button_sendall = KeyboardButton('/Рассылка')
-button_schedule = KeyboardButton('/Расписание')
-button_load_exercise_standards = KeyboardButton('/Загрузить_нормативы')
-button_exercise_standards = KeyboardButton('/Нормативы')
-button_load_place = KeyboardButton('/Загрузить_геопозицию')
-button_del_place = KeyboardButton('/Удалить_геопозицию')
-button_place = KeyboardButton('/места_занятий')
-button_start_timer = KeyboardButton('/Включить_регулярную_отправку_сообщений')
-button_off_timer = KeyboardButton('/Выключить_регулярную_отправку_сообщений')
+button_load = KeyboardButton('⬇️🆕 Загрузить новости')
+button_delete = KeyboardButton('❌🆕 Удалить новость')
+button_cancel = KeyboardButton('⬅️❌ Отмена')
+button_back = KeyboardButton('⬅️Назад')
+button_event = KeyboardButton('🆕 новости')
+button_sendall = KeyboardButton('📢 Рассылка')
+button_schedule = KeyboardButton('📝 расписание')
+button_load_exercise_standards = KeyboardButton('⬇🏃 Загрузить нормативы')
+button_exercise_standards = KeyboardButton('🏃 нормативы')
+button_load_place = KeyboardButton('⬇🚩 Загрузить геопозицию')
+button_del_place = KeyboardButton('❌🚩 Удалить геопозицию')
+button_place = KeyboardButton('🚩 места занятий')
+button_start_timer = KeyboardButton('⏲✅ ️Включить отправку сообщений в группу')
+button_off_timer = KeyboardButton('⏲️❌ Выключить отправку сообщений в группу')
 
 
 #Клавиатура админа
