@@ -1,9 +1,6 @@
-from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
 from create_bot import dp, bot
-from aiogram.dispatcher.filters import Text
-from keyboards import admin_kb
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards import admin_kb
 from data_base import sqlite_db, db
@@ -30,7 +27,6 @@ class FSM_generic(StatesGroup):  # Машины состояний
 
 
 # Получить ID текущего модератора
-# @dp.message_handler(commands=['moderator'], is_chat_admin=True)
 async def make_changes_command(message: types.Message):
     await message.delete()
     if not db_users.user_exists(message.from_user.id, 'admins'):  # проверка отсутствия пользователя в таблице админов
@@ -41,7 +37,6 @@ async def make_changes_command(message: types.Message):
 
 
 # Начало диалога загрузки нового пункта мероприятия
-# @dp.message_handler(commands='Загрузить', state=None)
 async def cm_start(message: types.Message):
     if db_users.user_exists(message.from_user.id, 'admins'):
         await FSM_generic.Step_event_0.set()
@@ -49,7 +44,6 @@ async def cm_start(message: types.Message):
 
 
 # Ловим первый ответ и пишем в словарь
-# @dp.message_handler(content_types=['photo'], state=FSM_generic.Step_0)
 async def load_photo(message: types.Message, state: FSM_generic):
     async with state.proxy() as data:
         data['Step_event_0'] = message.photo[0].file_id
@@ -58,17 +52,14 @@ async def load_photo(message: types.Message, state: FSM_generic):
 
 
 # Ловим второй ответ
-# @dp.message_handler(state=FSMAdmin.name)
 async def load_name(message: types.Message, state: FSM_generic):
     async with state.proxy() as data:
         data['Step_event_1'] = message.text
     await FSM_generic.Step_event_2.set()
-    # print(tuple(data.values()))
     await message.reply("Введи описание")
 
 
 # Ловим третий ответ
-# @dp.message_handler(state=FSMAdmin.description)
 async def load_description(message: types.Message, state: FSM_generic):
     async with state.proxy() as data:
         data['Step_event_2'] = message.text
@@ -79,7 +70,6 @@ async def load_description(message: types.Message, state: FSM_generic):
 
 
 # Выход из состояния
-# @dp.message_handler(state='*',commands='Отмена')
 async def cancel_handler(message: types.Message, state: FSM_generic):
     current_state = await state.get_state()
     if current_state is None:
@@ -109,15 +99,12 @@ async def delete_item(message: types.Message):
 
 
 # отправить сообщение всем пользователям в БД
-# @dp.message_handler(commands=['Рассылка'])
 async def command_sendall(message: types.Message):
     if db_users.user_exists(message.from_user.id, 'admins'):
         await FSM_generic.Step_sendall_0.set()
         await message.reply('Напишите текст который хотите всем отправить',
                             reply_markup=admin_kb.button_case_admin_with_but_cancel)
 
-
-# @dp.message_handler(state=FSM_generic.Step_0)
 async def sendall(message: types.Message, state: FSM_generic):
     if message.chat.type == 'private':
         text = message.text
@@ -138,14 +125,12 @@ async def sendall(message: types.Message, state: FSM_generic):
 
 
 # Команда чтобы загрузить нормативы
-# @dp.message_handler(commands=['Загрузить_нормативы'], state=None)
 async def exercise_standards_admin(message: types.Message):
     if db_users.user_exists(message.from_user.id, 'admins'):
         await FSM_generic.Step_exercise_standards_0.set()
         await message.reply('Загрузите фото нормативов', reply_markup=admin_kb.button_case_admin_with_but_cancel)
 
 
-# @dp.message_handler(content_types=['photo'], state=FSM_generic.Step_0)
 async def exercise_standards_photo(message: types.Message, state: FSM_generic):
     async with state.proxy() as data:
         data['Step_exercise_standards_0'] = message.photo[0].file_id
@@ -153,7 +138,6 @@ async def exercise_standards_photo(message: types.Message, state: FSM_generic):
     await message.reply("Теперь введи описание нормативов")
 
 
-# @dp.message_handler(state=FSM_generic.Step_1)
 async def exercise_standards_text(message: types.Message, state: FSM_generic):
     async with state.proxy() as data:
         data['Step_exercise_standards_1'] = message.text
@@ -169,21 +153,18 @@ async def place_admin(message: types.Message):
         await FSM_generic.Step_place_0.set()
         await message.reply('отправьте геопозицию', reply_markup=admin_kb.button_case_admin_with_but_cancel)
 
-# @dp.message_handler(content_types=['location'], state=FSM_generic.Step_place_0)
 async def place_location(message: types.Message, state: FSM_generic):
     async with state.proxy() as data:
         data['Step_place_0'] = str(message.location)
     await FSM_generic.Step_place_1.set()
     await message.reply("Теперь введи название геопозиции")
 
-# @dp.message_handler(state=FSM_generic.Step_place_1)
 async def place_title(message: types.Message, state: FSM_generic):
     async with state.proxy() as data:
         data['Step_place_1'] = message.text
     await FSM_generic.Step_place_2.set()
     await message.reply("Теперь введи адрес геопозиции")
 
-# @dp.message_handler(state=FSM_generic.Step_place_2)
 async def place_address(message: types.Message, state: FSM_generic):
     async with state.proxy() as data:
         data['Step_place_2'] = message.text
@@ -195,7 +176,6 @@ async def place_address(message: types.Message, state: FSM_generic):
 # удаления пункта геопозиции
 @dp.callback_query_handler(lambda x: x.data and x.data.startswith('del_place '))
 async def del_callback_place(callback_query: types.CallbackQuery):
-    # сделал какую-то гадость, нужно будет исправить (sqlite_db -> sql_delete_command)
     await sqlite_db.sql_delete_command(callback_query.data.replace('del_place ', ''), name='title', table='place')
     await callback_query.answer(text=f'{callback_query.data.replace("del_place ", "")} удалена.', show_alert=True)
 
@@ -205,7 +185,6 @@ async def delete_item_place(message: types.Message):
     if db_users.user_exists(message.from_user.id, 'admins'):
         read = await sqlite_db.sql_read2(name='place')
         for ret in read:
-            # print(ast.literal_eval(ret[0]))
             await bot.send_venue(message.from_user.id, latitude=ast.literal_eval(ret[0])["latitude"],
                                  longitude=ast.literal_eval(ret[0])["longitude"],
                                  title=ret[1], address=ret[2])
@@ -234,7 +213,6 @@ def timer():
     scheduler.start()
 
 # включает таймер
-# @dp.message_handler(commands=['Включить_регулярную_отправку_сообщений'])
 async def start_timer(message: types.Message):
     if message.chat["type"] == "private":
         global TimerFlag
@@ -249,7 +227,6 @@ async def start_timer(message: types.Message):
         pass
 
 #выключает таймер
-# @dp.message_handler(commands=['Выключить_регулярную_отправку_сообщений'])
 async def off_timer(message: types.Message):
     if message.chat["type"] == "private":
         global TimerFlag, scheduler

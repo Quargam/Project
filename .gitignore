@@ -5,3 +5,5 @@
 # ignore pycharm
 */*/__pycache__/*
 TG_Bot/__pycache__/*
+# ignore all bat
+*.bat

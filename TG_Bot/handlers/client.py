@@ -18,28 +18,20 @@ async def command_start(message: types.Message):
         await message.reply('общение с ботом через ЛС, напишите ему:\n https://t.me/HyperPashaBot')
     await message.delete()
 
-# @dp.message_handler(commands=['Мероприятие'])
 async def event_menu_command(message: types.Message):
-    # for ret in cur.execute('SELECT * FROM menu').fetchall():
-    #     await bot.send_photo(message.from_user.id, ret[0], f'{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]}')
     await sqlite_db.sql_read(message)
     await message.delete()
 
 @dp.message_handler(commands=['места_занятий'])
 async def place_menu_command(message: types.Message):
-    # for ret in cur.execute('SELECT * FROM menu').fetchall():
-    #     await bot.send_photo(message.from_user.id, ret[0], f'{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]}')
     await sqlite_db.sql_read_place(message)
     await message.delete()
 
 # Выводит расписание преподавателей
-# @dp.message_handler(commands=['Расписание'])
 async def schedule(message: types.Message):
     try:
         file = open("schedule.txt", encoding='utf-8')
         res_dict = ast.literal_eval(file.read())
-        # print(res_dict)
-        # Выводи расписание преподователей
         await bot.send_message(message.from_user.id, text ='\n'.join(list(f'{Days[day]} - {res_dict[str(day)]}' for day in range(6))))
     except FileNotFoundError:
         await bot.send_message(message.from_user.id, text='файл не найден')
@@ -50,7 +42,6 @@ async def exercise_standards(message: types.Message):
     try:
         file = open("exercise_standards.txt")
         res_dict = ast.literal_eval(file.read())
-        # print(res_dict)
         await bot.send_photo(message.from_user.id, res_dict[0], f'Описание:{res_dict[1]}\n')
     except FileNotFoundError:
         await bot.send_message(message.from_user.id, text='файл не найден')
