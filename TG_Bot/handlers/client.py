@@ -2,11 +2,13 @@ from aiogram import types, Dispatcher
 from create_bot import dp, bot
 from keyboards import kb_client
 from data_base import sqlite_db, db
-import ast
+from aiogram.dispatcher.filters.builtin import CommandStart
+from aiogram.dispatcher.filters import ChatTypeFilter, Text
 import json
 
 db_users = db.Database_users("Users_db.db")
 Days = {0: "пн", 1: "вт", 2: "ср", 3: "чт", 4: "пт", 5: "сб", 6: "вс"}
+
 
 # Действия когда пользователь вводит команду /start
 async def command_start(message: types.Message):
@@ -19,14 +21,14 @@ async def command_start(message: types.Message):
         await message.reply('общение с ботом через ЛС, напишите ему:\n https://t.me/HyperPashaBot')
     await message.delete()
 
+
 async def event_menu_command(message: types.Message):
     await sqlite_db.sql_read(message)
-    # await message.delete()
 
-# @dp.message_handler(commands=['места_занятий'])
+
 async def place_menu_command(message: types.Message):
     await sqlite_db.sql_read_place(message)
-    # await message.delete()
+
 
 # Выводит расписание преподавателей
 async def schedule(message: types.Message):
@@ -39,7 +41,8 @@ async def schedule(message: types.Message):
     except FileNotFoundError:
         await bot.send_message(message.from_user.id, text='файл не найден')
 
-# # Выводит Нормативы
+
+# Выводит Нормативы
 async def exercise_standards(message: types.Message):
     try:
         with open("exercise_standards.json", "r", encoding='utf-8') as exercise_standards_json:
@@ -51,8 +54,22 @@ async def exercise_standards(message: types.Message):
 
 
 def register_handlers_client(dp: Dispatcher):
-    dp.register_message_handler(command_start, commands=['start', 'help'])
-    dp.register_message_handler(event_menu_command, text='🆕 новости')
-    dp.register_message_handler(schedule, text='📝 расписание')
-    dp.register_message_handler(exercise_standards, text='🏃 нормативы')
-    dp.register_message_handler(place_menu_command, text='🚩 места занятий')
+    dp.register_message_handler(command_start,
+                                CommandStart(),
+                                state=None)
+    dp.register_message_handler(event_menu_command,
+                                Text('🆕 новости'),
+                                ChatTypeFilter(chat_type=types.ChatType.PRIVATE),
+                                state=None)
+    dp.register_message_handler(schedule,
+                                Text('📝 расписание'),
+                                ChatTypeFilter(chat_type=types.ChatType.PRIVATE),
+                                state=None)
+    dp.register_message_handler(exercise_standards,
+                                Text('🏃 нормативы'),
+                                ChatTypeFilter(chat_type=types.ChatType.PRIVATE),
+                                state=None)
+    dp.register_message_handler(place_menu_command,
+                                Text('🚩 места занятий'),
+                                ChatTypeFilter(chat_type=types.ChatType.PRIVATE),
+                                state=None)

@@ -7,8 +7,8 @@ from handlers import client, admin, other # Импортируем клиенс�
 async def on_startup(_): # Сбытие которое должно выполнится 1 раз при запуске
     sqlite_db.sql_start()  # подключение к БД
 
+admin.register_handlers_admins(dp)  # админские функции
 client.register_handlers_client(dp)  # клиенские функции
-admin.register_handlers_client(dp)  # админские функции
 other.register_handlers_other(dp)  # остальные функции
 
 
