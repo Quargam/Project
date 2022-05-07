@@ -2,6 +2,7 @@
 *.db
 # ignore all txt
 *.txt
+!module.txt
 # ignore pycharm
 */*/__pycache__/*
 TG_Bot/__pycache__/*

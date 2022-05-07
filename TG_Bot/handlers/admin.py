@@ -6,7 +6,6 @@ from keyboards import admin_kb
 from data_base import sqlite_db, db
 import ast
 import datetime
-import zoneinfo
 import json
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # для отправки сообщений в определенное время асинхр
 from aiogram.dispatcher.filters import ChatTypeFilter, Text, AdminFilter, ContentTypeFilter, Command
