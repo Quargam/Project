@@ -1,4 +1,7 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils.callback_data import CallbackData
+
+item_callback = CallbackData('del', 'item_name', 'name')
 
 #Кнопки клавиатуры админа
 button_load = KeyboardButton('⬇️🆕 Загрузить новости')

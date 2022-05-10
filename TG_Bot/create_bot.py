@@ -4,10 +4,13 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import json
 import asyncio
 
-with open("token.json", "r") as token_json:
-    token = json.load(token_json)
-
+try:
+    with open("config_token.json", "r") as token_json:
+        token = json.load(token_json)
+except FileNotFoundError:
+    print(f"exc: FileNotFoundError")
+    exit()
+bot = Bot(token=token["token"])  # ИНИЦИАЛИЗИРУЕМ БОТА
 storage = MemoryStorage()  # Машина состояний (хранение класса в оперативной памяти)
 loop = asyncio.get_event_loop()
-bot = Bot(token=token["TOKEN"])  # ИНИЦИАЛИЗИРУЕМ БОТА
 dp = Dispatcher(bot, storage=storage, loop=loop)  # ИНИЦИАЛИЗИРУЕМ диспетчер
