@@ -1,9 +1,13 @@
+from cgitb import text
+import datetime
 from aiogram import types, Dispatcher
 from create_bot import dp, bot
 from keyboards import kb_client
 from data_base import database
 from aiogram.dispatcher.filters.builtin import CommandStart
 from aiogram.dispatcher.filters import Text
+import asyncio
+from Filter import IsPrivate, IsUserAmin, IsNotUserAmin
 
 Days = {0: "пн", 1: "вт", 2: "ср", 3: "чт", 4: "пт", 5: "сб", 6: "вс"}
 
@@ -40,19 +44,27 @@ async def schedule(message: types.Message):
     if not database.database.schedule_status():
         database.database.schedule_create()
     schedule_data = database.database.schedule_read()
-    result_text = '\n'.join((f'{schedule_data[i][2]} - {schedule_data[i][3]}' for i in range(6)))
+    result_text = '\n'.join((f'{schedule_data[i][2]} - {schedule_data[i][3]}' for i in range(7)))
     await bot.send_message(message.from_user.id, text=result_text)
 
+async def plan_ex(message: types.Message):
+    if not database.database.plan_ex_status():
+        database.database.plan_ex_create()
+    plan_ex_data = database.database.plan_ex_read()
+    day = datetime.datetime.today().weekday()
+    result_text = f"{plan_ex_data[day][2]}: {plan_ex_data[day][3]}"
+    await bot.send_message(message.from_user.id, text=result_text)
 
 # Выводит Нормативы
 async def exercise_standards(message: types.Message):
+    await asyncio.sleep(0.3)
     if not database.database.ex_stand_status():
         database.database.ex_stand_create()
     ex_stand = database.database.ex_stand_read()
     try:
         await bot.send_photo(chat_id=message.from_user.id, photo=ex_stand[0][2], caption=ex_stand[0][3])
     except Exception:
-        pass
+        await bot.send_message(chat_id=message.from_user.id, text=' нормативы не загружены')
 
 
 def register_handlers_client(dp: Dispatcher):
@@ -60,11 +72,15 @@ def register_handlers_client(dp: Dispatcher):
                                 CommandStart(),
                                 state=None)
     dp.register_message_handler(news_menu,
-                                Text('🆕 новости'),
+                                text='🆕 новости',
                                 chat_type=types.ChatType.PRIVATE,
                                 state=None)
     dp.register_message_handler(schedule,
                                 Text('📝 расписание'),
+                                chat_type=types.ChatType.PRIVATE,
+                                state=None)
+    dp.register_message_handler(plan_ex,
+                                Text('План занятия'),
                                 chat_type=types.ChatType.PRIVATE,
                                 state=None)
     dp.register_message_handler(exercise_standards,

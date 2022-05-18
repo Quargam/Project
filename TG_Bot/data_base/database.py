@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, Float
 from aiogram import types
+from create_bot import bot
 
 days_val = {0: "пн", 1: "вт", 2: "ср", 3: "чт", 4: "пт", 5: "сб", 6: "вс"}
 
@@ -46,7 +47,56 @@ class Database:
             Column('address', String),
             Column('foursquare_id', String),
         )
+        self.plan_ex = Table(
+            'plan_ex', self.meta,
+            Column('id', Integer, primary_key=True),
+            Column('day_id', Integer),
+            Column('day', String),
+            Column('text', String),
+        )
+        self.id_chat = Table(
+            'id_chat', self.meta,
+            Column('id', Integer, primary_key=True),
+            Column('ID_group', Integer),
+            Column('ID_chat', Integer),
+        )
+        self.admins = Table(
+            'admins', self.meta,
+            # Column('id', Integer, primary_key=True),
+            Column('user_id', Integer, primary_key=True),
+            Column('first_name', String),
+            Column('active', Boolean),
+        )
         self.meta.create_all(engine)
+
+    def id_chat_status(self):
+        select = self.id_chat.select()
+        result = self.conn.execute(select).fetchall()
+        return bool(len(result))
+
+    def id_chat_read(self):
+        select = self.id_chat.select()
+        result = self.conn.execute(select).fetchall()
+        return result
+
+    def id_chat_update(self, message: types.Message):
+        self.conn.execute(self.id_chat.update().where(self.id_chat.c.id == 1).values(
+            ID_group=int(message.sender_chat.id),
+            ID_chat=int(message.chat.id),
+        ))
+
+    def id_chat_del(self, message: types.Message):
+        self.conn.execute(self.id_chat.update().where(self.id_chat.c.id == 1).values(
+            ID_group=None,
+            ID_chat=None,
+        ))
+
+    def id_chat_create(self):
+        insert = self.id_chat.insert().values(
+            ID_group=None,
+            ID_chat=None,
+        )
+        self.conn.execute(insert)
 
     def student_exist(self, message: types.Message):
         select = self.students.select().where(self.students.c.user_id == message.from_user.id)
@@ -66,6 +116,24 @@ class Database:
         result = self.conn.execute(select).fetchall()
         return result
 
+    def admin_exist(self, message: types.Message):
+        select = self.admins.select().where(self.admins.c.user_id == message.from_user.id)
+        result = self.conn.execute(select).fetchall()
+        return bool(len(result))
+
+    def admin_add(self, admin: list):
+        insert = self.admins.insert().values(
+            user_id=admin['user']['id'],
+            first_name=admin['user']['first_name'],
+            active=True,
+        )
+        self.conn.execute(insert)
+
+    def admin_read(self):
+        select = self.admins.select()
+        result = self.conn.execute(select).fetchall()
+        return result
+
     def student_active(self, student_id):
         """
         код который нигде не участвует
@@ -77,8 +145,8 @@ class Database:
         result = self.conn.execute(select).fetchall()
         return bool(len(result))
 
-    def schedule_update(self, day_id, text):
-        self.conn.execute(self.schedule.update().where(self.schedule.c.day_id == day_id).values(text=text))
+    def schedule_update(self, data):
+        self.conn.execute(self.schedule.update().where(self.schedule.c.day_id == int(data['day_id'])).values(text=data['text']))
 
     def schedule_create(self):
         for i in range(7):
@@ -154,6 +222,44 @@ class Database:
         delete = self.location.delete().where(self.location.c.title == title)
         self.conn.execute(delete)
 
+    def plan_ex_status(self):
+        select = self.plan_ex.select()
+        result = self.conn.execute(select).fetchall()
+        return bool(len(result))
+
+    def plan_ex_update(self, data):
+        self.conn.execute(self.plan_ex.update().where(self.plan_ex.c.day_id == int(data['day_id'])).values(text=data['text']))
+
+    def plan_ex_create(self):
+        for i in range(7):
+            insert = self.plan_ex.insert().values(
+                day_id=i,
+                day=days_val[i],
+                text='None',
+            )
+            self.conn.execute(insert)
+
+    def plan_ex_read(self):
+        select = self.plan_ex.select()
+        result = self.conn.execute(select).fetchall()
+        return result
+
 engine = create_engine('sqlite:///database.db', echo=False)
 meta = MetaData()
 database = Database(engine=engine, meta=meta)
+
+
+async def add_admins():
+    try:
+        admins = await bot.get_chat_administrators(database.id_chat_read()[0][1])
+        for admin in admins:
+            print(admin['user'])
+            database.admin_add(admin)
+    except Exception as exc:
+        print(f'add_admins: что-то не получилось - {exc}')
+
+
+def first_set_config():
+    if not database.id_chat_status():
+        database.id_chat_create()
+

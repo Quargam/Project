@@ -1,10 +1,12 @@
 from aiogram.utils import executor
 from create_bot import dp
 from handlers import client, admin, other # Импортируем клиенскую, админскую и остальную часть кода
-
+from data_base import database
+import Filter
 
 async def on_startup(_): # Сбытие которое должно выполнится 1 раз при запуске
-    pass
+    database.first_set_config()
+    Filter.setup(dp)
 
 admin.register_handlers_admins(dp)  # админские функции
 client.register_handlers_client(dp)  # клиенские функции
