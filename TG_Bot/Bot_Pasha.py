@@ -7,6 +7,10 @@ import Filter
 async def on_startup(_): # Сбытие которое должно выполнится 1 раз при запуске
     database.first_set_config()
     try:
+        """
+        Так как я не знаю как отслеживать изменения статуса админов, то просто каждый раз и обновляю их список
+        !нужно узнать как это сделать на 2.* версии aiogram!
+        """
         database.database.admin_del_all()
         await database.database.add_admins()
     except:

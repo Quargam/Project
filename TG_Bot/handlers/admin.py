@@ -45,6 +45,8 @@ async def set_config(message: types.Message):
 async def make_changes_command(message: types.Message):
     """
     передает модератору клавиатуру админа
+    Так как я не знаю как отслеживать изменения статуса админов, то просто каждый раз и обновляю их список
+    !нужно узнать как это сделать на 2.* версии aiogram!
     """
     database.database.admin_del_all()
     await database.database.add_admins()
