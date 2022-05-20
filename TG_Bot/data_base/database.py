@@ -134,6 +134,20 @@ class Database:
         result = self.conn.execute(select).fetchall()
         return result
 
+    def admin_del_all(self):
+        admins = database.admin_read()
+        for admin in admins:
+            delete = self.admins.delete().where(self.admins.c.user_id == admin[0])
+            self.conn.execute(delete)
+
+    async def add_admins(self):
+        try:
+            admins = await bot.get_chat_administrators(database.id_chat_read()[0][1])
+            for admin in admins:
+                database.admin_add(admin)
+        except Exception as exc:
+            print(f'add_admins: что-то не получилось - {exc}')
+
     def student_active(self, student_id):
         """
         код который нигде не участвует
@@ -247,16 +261,6 @@ class Database:
 engine = create_engine('sqlite:///database.db', echo=False)
 meta = MetaData()
 database = Database(engine=engine, meta=meta)
-
-
-async def add_admins():
-    try:
-        admins = await bot.get_chat_administrators(database.id_chat_read()[0][1])
-        for admin in admins:
-            print(admin['user'])
-            database.admin_add(admin)
-    except Exception as exc:
-        print(f'add_admins: что-то не получилось - {exc}')
 
 
 def first_set_config():

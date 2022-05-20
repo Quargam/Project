@@ -1,4 +1,3 @@
-from cgitb import text
 import datetime
 from aiogram import types, Dispatcher
 from create_bot import dp, bot
@@ -7,7 +6,6 @@ from data_base import database
 from aiogram.dispatcher.filters.builtin import CommandStart
 from aiogram.dispatcher.filters import Text
 import asyncio
-from Filter import IsPrivate, IsUserAmin, IsNotUserAmin
 
 Days = {0: "пн", 1: "вт", 2: "ср", 3: "чт", 4: "пт", 5: "сб", 6: "вс"}
 

@@ -6,6 +6,11 @@ import Filter
 
 async def on_startup(_): # Сбытие которое должно выполнится 1 раз при запуске
     database.first_set_config()
+    try:
+        database.database.admin_del_all()
+        await database.database.add_admins()
+    except:
+        pass
     Filter.setup(dp)
 
 admin.register_handlers_admins(dp)  # админские функции

@@ -9,7 +9,7 @@ import datetime
 import json
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # для отправки сообщений в определенное время асинхр
 from aiogram.dispatcher.filters import Text, Command
-from Filter import IsPrivate, IsUserAmin
+from Filter import IsPrivate, IsUserAdmin
 
 scheduler = AsyncIOScheduler()
 TimerFlag = False
@@ -46,6 +46,8 @@ async def make_changes_command(message: types.Message):
     """
     передает модератору клавиатуру админа
     """
+    database.database.admin_del_all()
+    await database.database.add_admins()
     await message.reply('OK', reply_markup=admin_kb.button_case_admin)
 
 
@@ -315,114 +317,113 @@ async def off_timer():
 
 def register_handlers_admins(dp: Dispatcher):
     dp.register_message_handler(make_changes_command,
+                                IsUserAdmin(),
                                 Command('модератор'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=None)
     dp.register_message_handler(cancel_handler,
+                                IsUserAdmin(),
                                 Text('⬅️❌ Отмена'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state='*')
     dp.register_message_handler(news_start,
                                 IsPrivate(),
-                                IsUserAmin(),
+                                IsUserAdmin(),
                                 Text('⬇️🆕 Загрузить новости'),
                                 state=None)
     dp.register_message_handler(load_photo,
+                                IsUserAdmin(),
                                 content_types=['photo'],
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_event_0)
     dp.register_message_handler(load_name,
+                                IsUserAdmin(),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_event_1)
     dp.register_message_handler(load_description,
+                                IsUserAdmin(),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_event_2)
     dp.register_message_handler(news_del,
+                                IsUserAdmin(),
                                 Text('❌🆕 Удалить новость'),
-                                chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
+                                chat_type=types.ChatType.PRIVATE,\
                                 state=None)
     dp.register_message_handler(markup_schedule,
+                                IsUserAdmin(),
                                 Text('⬇📝Изменить расписание'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=None)
     dp.register_message_handler(load_schedule,
+                                IsUserAdmin(),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_exercise_standards_load_0)
     dp.register_message_handler(plan_ex_all,
+                                IsUserAdmin(),
                                 Text('Планы занятий'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=None)
     dp.register_message_handler(markup_plan_ex_all,
+                                IsUserAdmin(),
                                 Text('Изменить план занятия'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=None)
     dp.register_message_handler(load_plan_ex,
+                                IsUserAdmin(),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_plan_ex_load_0)
     dp.register_message_handler(exercise_standards_admin,
+                                IsUserAdmin(),
                                 Text('⬇🏃 Загрузить нормативы'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=None)
     dp.register_message_handler(exercise_standards_photo,
+                                IsUserAdmin(),
                                 content_types=['photo'],
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_exercise_standards_0)
     dp.register_message_handler(exercise_standards_text,
+                                IsUserAdmin(),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_exercise_standards_1)
     dp.register_message_handler(command_sendall,
+                                IsUserAdmin(),
                                 Text('📢 Рассылка'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=None)
     dp.register_message_handler(sendall,
                                 chat_type=types.ChatType.PRIVATE,
                                 # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_sendall_0)
     dp.register_message_handler(place_admin,
+                                IsUserAdmin(),
                                 Text('⬇🚩 Загрузить геопозицию'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=None)
     dp.register_message_handler(delete_item_place,
+                                IsUserAdmin(),
                                 Text('❌🚩 Удалить геопозицию'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=None)
     dp.register_message_handler(place_location,
+                                IsUserAdmin(),
                                 content_types=['location', 'venue'],
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_place_0)
     dp.register_message_handler(place_title,
+                                IsUserAdmin(),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_place_loc_1)
     dp.register_message_handler(place_address,
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=FSM_generic.Step_place_loc_2)
     dp.register_message_handler(start_timer,
+                                IsUserAdmin(),
                                 Text('⏲✅ ️Включить отправку сообщений в группу'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=None)
     dp.register_message_handler(off_timer,
+                                IsUserAdmin(),
                                 Text('⏲️❌ Выключить отправку сообщений в группу'),
                                 chat_type=types.ChatType.PRIVATE,
-                                # is_chat_admin=int(ID_chat["ID_chat"]),
                                 state=None)
